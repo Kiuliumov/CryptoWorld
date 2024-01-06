@@ -1,0 +1,25 @@
+{
+  "name": "cryptoworld",
+  "version": "1.0.0",
+  "description": "A crypto news discord bot",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Kiuliumov/CryptoWorld.git"
+  },
+  "author": "Kiuliumov",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Kiuliumov/CryptoWorld/issues"
+  },
+  "homepage": "https://github.com/Kiuliumov/CryptoWorld#readme",
+  "dependencies": {
+    "@discordjs/builders": "^1.7.0",
+    "@discordjs/rest": "^2.2.0",
+    "discord-api-types": "^0.37.67",
+    "discord.js": "^14.14.1"
+  }
+}
