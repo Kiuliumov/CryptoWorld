@@ -1,21 +1,29 @@
 const { SlashCommandBuilder } = require("@discordjs/builders");
-const fs = require("fs");
+const { promises: fsPromises, existsSync } = require("fs");
 
-const configFile = 'serverConfigs.json';
+const configFile = "serverConfigs.json";
 
-function loadServerConfigs() {
-  try {
-    const data = fs.readFileSync(configFile, "utf8");
-    return JSON.parse(data);
-  } catch (error) {
-    console.error("Error loading server configs:", error.message);
+async function loadServerConfigs() {
+  if (existsSync(configFile)) {
+    try {
+      const data = await fsPromises.readFile(configFile, "utf8");
+      return JSON.parse(data);
+    } catch (error) {
+      console.error("Error loading server configs:", error.message);
+      return {};
+    }
+  } else {
     return {};
   }
 }
 
-function saveServerConfigs(configs) {
+async function saveServerConfigs(configs) {
   try {
-    fs.writeFileSync(configFile, JSON.stringify(configs, null, 2), "utf8");
+    await fsPromises.writeFile(
+      configFile,
+      JSON.stringify(configs, null, 2),
+      "utf8"
+    );
   } catch (error) {
     console.error("Error saving server configs:", error.message);
   }
@@ -25,27 +33,26 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName("setup")
     .setDescription("Set up the channel for receiving crypto news"),
+
   async execute(interaction) {
     const serverId = interaction.guildId;
-    const configs = loadServerConfigs();
-    await interaction.reply(
-      "Mention the channel where you want to receive crypto news."
-    );
-    const filter = (message) => message.author.id === interaction.user.id;
-    const collector = interaction.channel.createMessageCollector({
-      filter,
-      time: 30000,
-    });
-    collector.on("collect", (message) => {
-      const mentionedChannel = message.mentions.channels.first();
-      if (mentionedChannel) {
-        configs[serverId] = { newsChannelId: mentionedChannel.id };
-        saveServerConfigs(configs);
-        interaction.followUp(`Crypto news will be sent to ${mentionedChannel}`);
-      } else {
-        interaction.followUp("Invalid channel mentioned. Setup canceled.");
-      }
-      collector.stop();
-    });
+    const configs = await loadServerConfigs();
+
+    const channelId = interaction.channelId;
+    if (interaction.guild.channels.cache.has(channelId)) {
+      const channel = interaction.guild.channels.cache.get(channelId);
+      configs[serverId] = { newsChannelId: channelId };
+      await saveServerConfigs(configs);
+      interaction.reply({
+        content: `Crypto news will be sent to the channel ${channel}.`,
+        ephemeral: true,
+      });
+    } else {
+      interaction.reply({
+        content:
+          "Invalid channel ID or the channel does not exist. Setup canceled.",
+        ephemeral: true,
+      });
+    }
   },
 };
