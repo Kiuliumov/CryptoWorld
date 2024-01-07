@@ -41,7 +41,6 @@ client.on("interactionCreate", async (interaction) => {
   const { commandName } = interaction;
 
   try {
-    // Dynamically handle commands
     const command = require(`./commands/${commandName}`);
     if (command) {
       await command.execute(interaction);
