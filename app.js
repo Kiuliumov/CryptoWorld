@@ -1,3 +1,4 @@
+//todo get a new news api
 const { Client, GatewayIntentBits } = require("discord.js");
 const { REST } = require("@discordjs/rest");
 const { Routes } = require("discord-api-types/v9");
