@@ -1,2 +1,2 @@
 # CryptoWorld
-A crypto news discord bot
+A crypto news discord application
